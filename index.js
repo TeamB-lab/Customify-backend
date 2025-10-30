@@ -54,7 +54,7 @@ initializeDatabase();
 app.get('/', async (req, res) => {
     try {
         // Retrieve the data from the table
-        const result = await client.query("SELECT message FROM team_data LIMIT 1");
+        const result = await client.query("SELECT * FROM team_data WHERE message = 'Team B'");
 
         if (result.rows.length > 0) {
             const message = result.rows[0].message;
