@@ -34,13 +34,13 @@ async function initializeDatabase() {
         );
 
         // Check if the required 'Team B' row already exists
-        const check = await client.query("SELECT * FROM team_data WHERE message = 'Team B'");
+        //const check = await client.query("SELECT * FROM team_data WHERE message = 'Team B'");
 
         // Insert the row only if it doesn't exist
-        if (check.rows.length === 0) {
+        /*if (check.rows.length === 0) {
             await client.query("INSERT INTO team_data (message) VALUES ('Team B')");
             console.log("📝 Successfully inserted 'Team B' data.");
-        }
+        }*/
     } catch (err) {
         console.error('❌ Error initializing database:', err);
     }
