@@ -64,7 +64,7 @@ app.get('/', async (req, res) => {
                 <html>
                 <head><title>Customify Backend Status</title></head>
                 <body>
-                    <h1>Customify Backend Status: RUNNING</h1>
+                    <h1 style="color:red;">Customify Backend Status: RUNNING</h1>
                     <p>Data retrieved from PostgreSQL: <strong>${message}</strong></p>
                     <p>This page confirms the database connection and data retrieval task is complete.</p>
                 </body>
