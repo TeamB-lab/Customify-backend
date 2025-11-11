@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { Client } = require('pg');
 const app = express();
 // Use the PORT set by Render (10000) or a default for local testing
