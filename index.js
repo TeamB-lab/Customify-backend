@@ -3,6 +3,7 @@ const { Client } = require('pg');
 const app = express();
 // Use the PORT set by Render (10000) or a default for local testing
 const port = process.env.PORT || 10000; 
+app.use(cors());
 
 // --- Database Configuration and Connection ---
 
@@ -19,6 +20,29 @@ const client = new Client({
 client.connect()
     .then(() => console.log('✅ Connected to PostgreSQL database.'))
     .catch(err => console.error('❌ Database connection error. Check DATABASE_URL and Render status.', err));
+
+
+// --- API ENDPOINTS ---
+
+/**
+ * [GET] /api/products
+ * Endpoint to retrieve all products from the 'products' table
+ */
+app.get('/api/products', async (req, res) => {
+    try {
+        // 1. Esegui la query al database
+        const result = await client.query("SELECT * FROM products");
+
+        // 2. Rispondi con i dati in formato JSON
+        res.status(200).json(result.rows);
+
+    } catch (err) {
+        console.error('❌ Error fetching products:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 
 
 // --- Database Initialization (Create Table and Insert 'Team B') ---
