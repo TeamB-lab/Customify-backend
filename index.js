@@ -43,7 +43,37 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
+/**
+ * [GET] /api/products/:id
+ * Endpoint to retrieve a single product by its ID
+ */
+app.get('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
 
+        const query = {
+            text: 'SELECT * FROM products WHERE id = $1',
+            values: [id],
+        };
+
+        const result = await client.query(query);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        res.status(200).json(result.rows[0]);
+
+    } catch (err) {
+        console.error('❌ Error fetching single product:', err);
+
+        if (err.code === '22P02') {
+             return res.status(400).json({ error: 'Invalid product ID format' });
+        }
+        
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 // --- Database Initialization (Create Table and Insert 'Team B') ---
