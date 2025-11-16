@@ -5,7 +5,12 @@ const app = express();
 // Use the PORT set by Render (10000) or a default for local testing
 const port = process.env.PORT || 10000; 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'https://customify-backend.onrender.com'],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:3000', 
+    'https://customify-backend.onrender.com',
+    'https://customify-frontend.onrender.com'
+  ],
   credentials: true
 }));
 
