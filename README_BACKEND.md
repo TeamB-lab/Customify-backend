@@ -46,3 +46,27 @@ The most a user can do is **refresh the page to view data** that has been succes
     ```json
     { "error": "Invalid product ID format" }
     ```
+
+### Orders
+
+#### POST /api/orders
+* **Description:** Creates a new order.
+* **Payload (JSON):**
+    ```json
+    {
+        "user_id": 1,
+        "total_amount": 50.00,
+        "items": [
+            { "product_id": 1, "quantity": 2, "price": 25.00 }
+        ]
+    }
+    ```
+* **Success Response (201 Created):**
+    ```json
+    { "message": "Order created successfully", "orderId": 12 }
+    ```
+
+### Products (Updated)
+
+#### GET /api/products
+* **Description:** Retrieves products. Supports `?category=NAME` filter.
