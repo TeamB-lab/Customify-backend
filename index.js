@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { Client } = require('pg');
 const app = express();
+app.use(express.json());
+
 // Use the PORT set by Render (10000) or a default for local testing
 const port = process.env.PORT || 10000; 
 app.use(cors({
@@ -35,14 +37,22 @@ client.connect()
 
 /**
  * [GET] /api/products
- * Endpoint to retrieve all products from the 'products' table
+ * Endpoint to retrieve all products, optionally filtered by category
+ * Usage: /api/products?category=hoodies
  */
 app.get('/api/products', async (req, res) => {
     try {
-        // 1. Esegui la query al database
-        const result = await client.query("SELECT * FROM products");
+        const { category } = req.query; 
+        
+        let queryText = "SELECT * FROM products";
+        let queryParams = [];
 
-        // 2. Rispondi con i dati in formato JSON
+        if (category) {
+            queryText += " WHERE category = $1";
+            queryParams.push(category);
+        }
+
+        const result = await client.query(queryText, queryParams);
         res.status(200).json(result.rows);
 
     } catch (err) {
@@ -79,6 +89,52 @@ app.get('/api/products/:id', async (req, res) => {
              return res.status(400).json({ error: 'Invalid product ID format' });
         }
         
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+/**
+ * [POST] /api/orders
+ * Endpoint to create a new order from cart data
+ */
+app.post('/api/orders', async (req, res) => {
+    try {
+        const { user_id, items, total_amount } = req.body;
+
+        // Basic Validation
+        if (!items || items.length === 0) {
+            return res.status(400).json({ error: 'Cart is empty' });
+        }
+
+        // 1. Insert Order Header
+        const orderQuery = `
+            INSERT INTO orders (user_id, total_amount, status)
+            VALUES ($1, $2, 'confirmed')
+            RETURNING id
+        `;
+        // Note: user_id || null ensures we don't crash if user_id is missing
+        const orderResult = await client.query(orderQuery, [user_id || null, total_amount]);
+        const newOrderId = orderResult.rows[0].id;
+
+        // 2. Insert Order Items
+        for (const item of items) {
+            const itemQuery = `
+                INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase)
+                VALUES ($1, $2, $3, $4)
+            `;
+            // We assume the frontend sends items with { product_id, quantity, price }
+            await client.query(itemQuery, [newOrderId, item.product_id, item.quantity, item.price]);
+        }
+
+        // 3. Respond with Success
+        console.log(`✅ Order #${newOrderId} created successfully.`);
+        res.status(201).json({ 
+            message: 'Order created successfully', 
+            orderId: newOrderId 
+        });
+
+    } catch (err) {
+        console.error('❌ Error creating order:', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
