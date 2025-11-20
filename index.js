@@ -1,8 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { Client } = require('pg');
 const app = express();
 app.use(express.json());
+
+
 
 // Use the PORT set by Render (10000) or a default for local testing
 const port = process.env.PORT || 10000; 
@@ -15,6 +19,8 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+
 
 // --- Database Configuration and Connection ---
 
@@ -32,6 +38,11 @@ client.connect()
     .then(() => console.log('✅ Connected to PostgreSQL database.'))
     .catch(err => console.error('❌ Database connection error. Check DATABASE_URL and Render status.', err));
 
+
+// --- Authentication Routes ---
+const authRoutes = require('./authRoutes')(client);
+
+app.use('/api/auth', authRoutes);
 
 // --- API ENDPOINTS ---
 
