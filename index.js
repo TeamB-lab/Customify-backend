@@ -73,6 +73,35 @@ app.get('/api/products', async (req, res) => {
 });
 
 /**
+ * [GET] /api/products4
+ * Endpoint to retrieve the first four products, optionally filtered by category
+ * Usage: /api/products4?category=hoodies
+ */
+app.get('/api/products4', async (req, res) => {
+    try {
+        const { category } = req.query; 
+        
+        let queryText = "SELECT * FROM products";
+        let queryParams = [];
+
+        if (category) {
+            queryText += " WHERE category = $1";
+            queryParams.push(category);
+        }
+
+        queryText += " LIMIT 4";
+
+        const result = await client.query(queryText, queryParams);
+        res.status(200).json(result.rows);
+
+    } catch (err) {
+        console.error('❌ Error fetching products:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+/**
  * [GET] /api/products/:id
  * Endpoint to retrieve a single product by its ID
  */
