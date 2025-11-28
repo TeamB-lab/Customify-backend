@@ -1,10 +1,13 @@
+//index.js
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const { Client } = require('pg');
+const authenticateToken = require('./authenticateToken');
 const app = express();
 app.use(express.json());
+
 
 
 
@@ -179,6 +182,17 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
+// --- TEST ROUTE FOR AUTHENTICATION (DELETE LATER) ---
+// This route is protected. Only requests with a valid token can access it.
+app.get('/api/test-auth', authenticateToken, (req, res) => {
+  // If we reach here, it means the middleware let us pass.
+  // We can access the user info that the middleware attached to 'req.user'.
+  res.status(200).json({
+    message: 'Authentication successful! You are inside a protected route.',
+    user_info_from_token: req.user
+  });
+});
+// ----------------------------------------------------
 
 // --- Database Initialization (Create Table and Insert 'Team B') ---
 
